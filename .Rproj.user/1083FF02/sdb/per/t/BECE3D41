@@ -1,0 +1,16 @@
+{
+    "contents" : "best <- function(state, outcome) {\n  ## Read outcome data\n  data <- read.csv(\"outcome-of-care-measures.csv\", colClasses = \"character\")\n  \n  ## Coerce the death rate columns to be numeric. \n  ## Heart.Attack is col 11.\n  data[,11] <- as.numeric(data[,11])\n  \n  ## Heart.Failure is col 17.\n  data[,17] <- as.numeric(data[,17])\n  \n  ## Pneumonia is col 23.\n  data[,23] <- as.numeric(data[,23])\n  \n  ## Check that the state and outcome are valid\n  if (outcome != \"heart attack\" && outcome != \"heart failure\" && outcome != \"pneumonia\"){\n    stop(\"invalid outcome\")\n  }\n  \n  if (state %in% data[,7] == FALSE) {\n    stop(\"invalid state\")\n  }\n  \n  ## Return the hospital in the state with the lowest 30 death rate.\n  oss <- subset(data, State == state)\n  if (outcome == \"heart attack\"){\n    bad <- is.na(oss[,11])\n    minob <- min(oss[,11][!bad])\n    besth <- subset(oss, oss[,11] == minob)\n  }\n  \n  if (outcome == \"heart failure\"){\n    bad <- is.na(oss[,17])\n    min(oss[,17][!bad])\n    minob <- min(oss[,17][!bad])\n    besth <- subset(oss, oss[,17] == minob)\n  }\n  \n  if (outcome == \"pneumonia\"){\n    bad <- is.na(oss[,23])\n    min(oss[,23][!bad])\n    minob <- min(oss[,23][!bad])\n    besth <- subset(oss, oss[,23] == minob)\n  }\n  \n  besth[,2]\n  \n}",
+    "created" : 1406520722362.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1695210853",
+    "id" : "BECE3D41",
+    "lastKnownWriteTime" : 1406521836,
+    "path" : "C:/Git/rprog-005_ass3/best.R",
+    "project_path" : "best.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
