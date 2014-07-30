@@ -24,19 +24,31 @@ rankhospital <- function(state, outcome, num = "best") {
   ## Return hospital in that state with the given rank
   ## in 30-day death rate
   
+  ## Subset the data so you only have the state you care about.
+  dfs <- subset(data, State == state)
+  attach(dfs)
   
   ## For outcome == "heart attack"
+  if (outcome == "heart attack") {
   
-  ## Sort the data for state by col 11.
-  attach(dfs)
-  sd <- dfs[order(dfs[,11]),]
+    ## Sort the data for state by col 11.
+    sd <- dfs[order(dfs[,11]),]
+  }
+  
+  ## For outcome == "heart failure"
+  if (outcome == "heart failure") {
+    
+    ## Sort the data for state by col 17.
+    sd <- dfs[order(dfs[,17]),]
+  }
+  
+  ## For outcome == "pneumonia"
+  if (outcome == "pneumonia") {
+    
+    ## Sort the data for state by col 23.
+    sd <- dfs[order(dfs[,23]),]
+  }
+  
   sd[num,2]
-  
-  
-  
-  
-  
-  
-  
   
 }
