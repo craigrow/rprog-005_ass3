@@ -32,21 +32,21 @@ rankhospital <- function(state, outcome, num = "best") {
   if (outcome == "heart attack") {
   
     ## Sort the data for state by col 11.
-    sd <- dfs[order(dfs[,11]),]
+    sd <- dfs[order(dfs[,11]), dfs[,2],]
   }
   
   ## For outcome == "heart failure"
   if (outcome == "heart failure") {
     
     ## Sort the data for state by col 17.
-    sd <- dfs[order(dfs[,17]),]
+    sd <- dfs[order(dfs[,17], dfs[,2]),]
   }
   
   ## For outcome == "pneumonia"
   if (outcome == "pneumonia") {
     
     ## Sort the data for state by col 23.
-    sd <- dfs[order(dfs[,23]),]
+    sd <- dfs[order(dfs[,23], dfs[,2]),]
   }
   
   sd[num,2]
