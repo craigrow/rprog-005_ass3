@@ -1,20 +1,11 @@
 rankhospital <- function(state, outcome, num = "best") {
   ## Read outcome data
   data <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
-  
-  if (num == "best") {
-    num <- 1
+  col <- 0
+  worst <- FALSE
+  if (num == "worst") {
+    worst <- TRUE
   }
-  
-  ## Coerce the death rate columns to be numeric. 
-  ## Heart.Attack is col 11.
-  data[,11] <- as.numeric(data[,11])
-  
-  ## Heart.Failure is col 17.
-  data[,17] <- as.numeric(data[,17])
-  
-  ## Pneumonia is col 23.
-  data[,23] <- as.numeric(data[,23])
   
   ## Check that state and outcome are valid
   if (outcome != "heart attack" && outcome != "heart failure" && outcome != "pneumonia"){
@@ -24,35 +15,39 @@ rankhospital <- function(state, outcome, num = "best") {
   if (state %in% data[,7] == FALSE) {
     stop("invalid state")
   }
+    
+  ## Subset data 
+  data <- subset(data, State == state)
   
-  ## Return hospital in that state with the given rank
-  ## in 30-day death rate
+  if (num == "best" | num == "worst") {
+    num <- 1
+  }
   
-  ## Subset the data so you only have the state you care about.
-  dfs <- subset(data, State == state)
-  attach(dfs)
-  
-  ## For outcome == "heart attack"
   if (outcome == "heart attack") {
-  
-    ## Sort the data for state by col 11.
-    sd <- dfs[order(dfs[,11]), dfs[,2],]
+    col <- 11
   }
   
-  ## For outcome == "heart failure"
   if (outcome == "heart failure") {
-    
-    ## Sort the data for state by col 17.
-    sd <- dfs[order(dfs[,17], dfs[,2]),]
+    col <- 17
   }
   
-  ## For outcome == "pneumonia"
   if (outcome == "pneumonia") {
-    
-    ## Sort the data for state by col 23.
-    sd <- dfs[order(dfs[,23], dfs[,2]),]
+    col <- 23
   }
   
-  sd[num,2]
+  names <- data[,2]
   
+  outcomes <- as.numeric(data[,col])
+  wdata <- data.frame(names, outcomes)
+  wdata <- wdata[complete.cases(wdata),]
+  
+  if (worst == FALSE) {
+    wdata <- wdata[with(wdata, order(outcomes, names)),]
+  }
+  
+  if (worst == TRUE) {
+    wdata <- wdata[with(wdata, order(-outcomes, names)),]
+  }
+  answer <- as.vector(wdata[num,1])
+  answer
 }
