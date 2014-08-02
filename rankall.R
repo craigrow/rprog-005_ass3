@@ -2,47 +2,65 @@ rankall <- function(outcome, num = "best") {
   ## Load the data
   data <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
   
-  ## Check for input errors
-  ## TODO
-  
-  ## Create vars to hold state and hospital names.
-  states <- vector()
-  hosp <- vector()
-  
-  ## Set the outcome column
-  if (outcome == "heart attack"){
-    outcome <- 11
+  ## Check that state and outcome are valid
+  if (outcome != "heart attack" && outcome != "heart failure" && outcome != "pneumonia"){
+    stop("invalid outcome")
   }
   
-  if (outcome == "heart failure") {
-    outcome <- 17
+  ## Create some vars to use later
+  wstates <- vector()
+  whospitals <- vector()
+  if (num == "best" | num == "worst") {
+    rank <- 1
+  }
+  if (num != "best" && num !="worst") {
+    rank <- num
+  }
+  worst <- FALSE
+  if (num == "worst") {
+    worst <- TRUE
   }
   
+  ## Create the working dataframe.
+  hospitals <- data[,2]
+  states <- data[,7]
+  if (outcome == "heart attack") {
+    outcomes <- as.numeric(data[,11])
+  }
+  if (outcome == 'heart failure') {
+    outcomes <- as.numeric(data[,17])
+  }
   if (outcome == "pneumonia") {
-    outcome <- 23
+    outcomes <- as.numeric(data[,23])
   }
+  wdata <- data.frame(hospitals, states, outcomes)
+  wdata <- wdata[complete.cases(wdata),]
   
-  ## For each state...
-  ## Find the first state.
-  if (nrow(data) != 0) {
-    state <- as.vector(data[1,7])
-    states <- c(states, state)
-  
+  ## Loop throught the data for each state.
+  while (nrow(wdata) != 0) {
+    wstate <- as.vector(wdata[1,2])
+    wstates <- c(wstates, wstate)
+    
     ## MOVE all hospitals for that state to a new data frame with the necessary columns.
-    state_df <- subset(data, State == state)
+    state_df <- subset(wdata, states == wstate)
     ## TODO, now delete them from the source data frame
-    data <- subset(data, State != state)
-  
+    wdata <- subset(wdata, states != wstate)
+    
     ## Sort the new state-specific data frame.
-    state_df <- state_df[with(state_df, order(state_df[,outcome], state_df[,2])),]
-  
+    state_df <- state_df[with(state_df, order(outcomes, hospitals)),]
+    if (worst == TRUE) {
+      state_df <- state_df[with(state_df, order(-outcomes, hospitals)),]
+    }
     ## Pull the desired hospital and add it to a result data frame.
-    hosp <- c(hosp, state_df[num,2])
+    whospital <- as.vector(state_df[rank, 1])
+    whospitals <- as.vector(c(whospitals, whospital))
   }
   
-  ## Create a new DF and populate it
-  answer <- data.frame(states, hosp)
+  answer <- data.frame(whospitals, wstates)
+  answer <- answer[with(answer, order(wstates)),]
+  names(answer)[names(answer) == "whospitals"] <- "hospital"
+  names(answer)[names(answer) == "wstates"] <- "state"
+  row.names(answer) <- wstates
   answer
-  
   
 }
